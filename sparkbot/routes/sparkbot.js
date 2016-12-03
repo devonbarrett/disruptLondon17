@@ -5,7 +5,7 @@ var router = express.Router();
 
 // flint options
 var config = {
-  webhookUrl: 'http://app.spoken.tech/flint',
+  webhookUrl: 'https://app.spoken.tech/flint',
   token: '***REMOVED***',
   port: 80
 };
@@ -15,7 +15,7 @@ var flint = new Flint(config);
 flint.start();
 
 // say hello
-flint.hears('/startCall', function(bot, trigger) {
+flint.hears('call', function(bot, trigger) {
   bot.dm(trigger.personEmail, "Beep! Boop! You call is ready. Please dial +44 1223 790430 to start");
 });
 
