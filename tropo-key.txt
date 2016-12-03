@@ -1,4 +1,0 @@
-app name: disrupt
-Number : +44 1223 790430
-voice:  ***REMOVED***
-messaging: ***REMOVED***
