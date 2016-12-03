@@ -31,8 +31,8 @@ function record(lang, prompt) {
 function makeTranslator(sttModel, ltModel, receiver) {
   return function(file) {
     var speech_to_text = new SpeechToTextV1({
-      username: process.env.WATSON_USER,
-      password: process.env.WATSON_PASSWORD
+      username: process.env.WATSON_STT_USER,
+      password: process.env.WATSON_STT_PASSWORD
     });
 
     var params = {
@@ -66,7 +66,7 @@ function translate(text, ltModel, cb) {
     username: process.env.WATSON_LT_USER,
     password: process.env.WATSON_LT_PASSWORD,
     version: 'v2',
-    url: 'https://gateway.watsonplatform.net/language-translator/api' 
+    url: 'https://gateway.watsonplatform.net/language-translator/api'
   });
 
   text = text.toLowerCase().trim();

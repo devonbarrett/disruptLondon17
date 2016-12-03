@@ -1,5 +1,0 @@
-{
-  "url": "https://stream.watsonplatform.net/speech-to-text/api",
-  "password": "***REMOVED***",
-  "username": "***REMOVED***"
-}
