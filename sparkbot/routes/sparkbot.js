@@ -15,8 +15,8 @@ var flint = new Flint(config);
 flint.start();
 
 // say hello
-flint.hears('/start', function(bot, trigger) {
-  bot.say('Hello %s!', trigger.personDisplayName);
+flint.hears('/startCall', function(bot, trigger) {
+  bot.dm(trigger.personEmail, "Beep! Boop! You call is ready. Please dial +44 1223 790430 to start");
 });
 
 // define express path for incoming webhooks
