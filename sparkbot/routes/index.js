@@ -8,8 +8,13 @@ router.get('/sparkhook', function(req, res, next) {
   res.send(sparkHooks.processCMD());
 });
 
-router.all('/tropo', function(req, res, next) {
-  res.send(tropoHooks.incomingCall());
+router.all('/tropo/start', function(req, res, next) {
+  res.send(tropoHooks.callStart());
 });
+
+router.all('/tropo/translate', function(req, res, next) {
+  res.send(tropoHooks.translate());
+});
+
 
 module.exports = router;
