@@ -3,81 +3,33 @@ var SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
 var LanguageTranslatorV2 = require('watson-developer-cloud/language-translator/v2');
 var fs = require('fs');
 var stream = require('stream');
-var childproc = require('child_process');
 var bot = require('../bot.js');
 
-function unfuckRecord(tropo, opts) {
-  /*
-     opts = opts || {};
-     opts.attempts = opts.attempts || 1;
-     opts.bargein = opts.bargein === undefined ? true : false;
-     opts.beep = opts.beep === undefined ? true : false;
-     */
-
-  return tropo.tropo.push({ record: opts })
-};
-
-function doRecord(prompt) {
+function record(lang, prompt) {
   var tropo = new twapi.TropoWebAPI();
-  /*
-  tropo.tropo = [
-    {say: [{value: 'Starting recording now!'}]},
-    {startRecording: {
-      name: 'segment1',
-      url: 'http://app.spoken.tech/tropo/translate',
+
+  var say = prompt ? { 'value': prompt } : null;
+  tropo.tropo.push({
+    record: {
+      say: say,
+      maxSilence: 1,
+      bargein: false,
+      maxTime: 10,
+      url: 'http://app.spoken.tech/tropo/' + lang + '/translate',
       format: 'audio/wav',
-    }},
-    {wait: {milliseconds: 10000}},
-    {stopRecording: null},
-    {startRecording: {
-      name: 'segment2',
-      url: 'http://app.spoken.tech/tropo/translate',
-      format: 'audio/wav',
-    }},
-    {wait: {milliseconds: 10000}},
-    {stopRecording: null},
-  ]
-  */
-  //prompt = !!prompt;
-  var say = prompt ? { 'value': 'Tell us a few words in spanish' } : null;
-  unfuckRecord(tropo, {
-    say: say,
-    maxSilence: 1,
-    bargein: false,
-    maxTime: 10,
-    url: 'http://app.spoken.tech/tropo/translate',
-    format: 'audio/wav',
-    beep: prompt,
+    }
   });
   tropo.tropo.push({
       on: [{
         event: 'continue',
-        next: '/tropo/continue',
-      }, {
-        event: 'incomplete',
-        next: '/tropo/incomplete',
-      }, {
-        event: 'error',
-        next: '/tropo/error',
-      }, {
-        event: 'hangup',
-        next: '/tropo/hangup',
-      }
-    ]
+        next: 'http://app.spoken.tech/tropo/' + lang + '/continue',
+      }]
   });
   return twapi.TropoJSON(tropo);
 }
 
-module.exports = {
-  callStart: function() {
-    return doRecord(true);
-  },
-
-  callContinue: function() {
-    return doRecord();
-  },
-
-  translate: function(file) {
+function makeTranslator(sttModel, ltModel, receiver) {
+  return function(file) {
     var speech_to_text = new SpeechToTextV1({
       username: process.env.WATSON_USER,
       password: process.env.WATSON_PASSWORD
@@ -85,7 +37,7 @@ module.exports = {
 
     var params = {
       content_type: 'audio/wav',
-      model: 'es-ES_NarrowbandModel',
+      model: sttModel,
     };
 
     // create the stream
@@ -97,19 +49,19 @@ module.exports = {
 
     recognizeStream.setEncoding('utf8'); // to get strings instead of Buffers from `data` events
     recognizeStream.on('data', function(chunk) {
-      translate(chunk, function(trans) {
+      translate(chunk, ltModel, function(trans) {
         trans.translations.forEach(function(textObj) {
-          bot.sendChatMsg(textObj.translation, 'twooster@gmail.com');
+          bot.sendChatMsg(textObj.translation, receiver);
         });
       });
     });
 
     s.pipe(recognizeStream);
     return {};
-  },
-};
+  };
+}
 
-function translate(text, cb) {
+function translate(text, ltModel, cb) {
   var language_translator = new LanguageTranslatorV2({
     username: process.env.WATSON_LT_USER,
     password: process.env.WATSON_LT_PASSWORD,
@@ -119,10 +71,10 @@ function translate(text, cb) {
 
   text = text.toLowerCase().trim();
   var args = {
-    model_id: 'es-en-conversational',
+    model_id: ltModel,
     text: text,
   };
-  console.log('Translation args:', args);
+  console.log('translate', ltModel, text);
   language_translator.translate(args, function (err, translation) {
     if (err) {
       console.log('translation error:', err);
@@ -131,3 +83,25 @@ function translate(text, cb) {
     }
   });
 }
+
+module.exports = {
+  startSpanish: function() {
+    return record('es', 'Please speak to me in Spanish');
+  },
+
+  continueSpanish: function() {
+    return record('es');
+  },
+
+  translateSpanish: makeTranslator('es-ES_NarrowbandModel', 'es-en-conversational',  'twooster@gmail.com'),
+
+  startEnglish: function() {
+    return record('en', 'Please speak to me in English');
+  },
+
+  continueEnglish: function() {
+    return record('en');
+  },
+
+  translateEnglish: makeTranslator('en-US_NarrowbandModel', 'en-es-conversational', 'devon@devonbarrett.net'),
+};
