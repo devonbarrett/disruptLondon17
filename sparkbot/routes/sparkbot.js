@@ -28,3 +28,4 @@ process.on('SIGINT', function() {
   });
 });
 
+module.exports = router;
