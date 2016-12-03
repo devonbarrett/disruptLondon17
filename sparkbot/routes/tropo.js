@@ -1,6 +1,6 @@
 var tropoHooks = require('../webhooks/tropo.js');
 var router = require('express').Router();
-var upload = require('multer').multer();
+var upload = require('multer')();
 
 router.all('/es/start', function(req, res, next) {
   res.send(tropoHooks.startSpanish());
