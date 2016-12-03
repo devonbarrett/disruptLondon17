@@ -8,7 +8,7 @@ router.get('/sparkhook', function(req, res, next) {
   res.send(sparkHooks.processCMD());
 });
 
-router.get('/tropo', function(req, res, next) {
+router.all('/tropo', function(req, res, next) {
   res.send(tropoHooks.incomingCall());
 });
 
