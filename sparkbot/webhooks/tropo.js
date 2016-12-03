@@ -1,28 +1,40 @@
 var twapi = require('tropo-webapi');
 
+var recordDefaults = {
+  attempts: 1,
+  baregin: true,
+  beep: true,
+  format: 'audio/wav'
+};
+
 function unfuckRecord(tropo, opts) {
   opts = opts || {};
-  // function(attempts, bargein, beep, choices, format, maxSilence, maxTime,
-  //          method, minConfidence, name, required, say, timeout,
-  //          transcription, url, password, username)
-  return tropo.record(opts.attempts,
-               opts.bargain,
-               opts.beep,
-               opts.choices,
-               opts.format,
-               opts.maxSilence,
-               opts.maxTime,
-               opts.method,
-               opts.minConfidence,
-               opts.name,
-               opts.required,
-               opts.say,
-               opts.timeout,
-               opts.transcription,
-               opts.url,
-               opts.password,
-               opts.username)
+  opts.attempts = opts.attempt || 1;
+  opts.bargein = opts.bargein === undefined ? true : false;
+  opts.beep = opts.beep === undefined ? true : false;
 
+  return tropo.record(
+    opts.attempts,
+    opts.asyncUpload,
+    opts.bargein,
+    opts.beep,
+    opts.choices,
+    opts.format,
+    opts.maxSilence,
+    opts.maxTime,
+    opts.method,
+    opts.minConfidence,
+    opts.name,
+    opts.required,
+    opts.say,
+    opts.timeout,
+    opts.transcription,
+    opts.url,
+    opts.password,
+    opts.username,
+    opts.voice,
+    opts.allowSignals,
+    opts.interdigitTimeout);
 };
 
 module.exports = {
