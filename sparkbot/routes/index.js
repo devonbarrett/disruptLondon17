@@ -12,7 +12,7 @@ router.all('/tropo/start', function(req, res, next) {
   res.send(tropoHooks.callStart());
 });
 
-router.get('/tropo/translate', function(req, res, next) {
+router.all('/tropo/translate', function(req, res, next) {
   res.send(tropoHooks.translate());
 });
 
