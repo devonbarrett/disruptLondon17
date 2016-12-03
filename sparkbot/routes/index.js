@@ -16,9 +16,7 @@ router.all('/tropo/start', function(req, res, next) {
 });
 
 router.all('/tropo/translate', upload.any(), function(req, res, next) {
-  console.log(req.body.length);
-  console.log(req.files);
-  res.send(tropoHooks.translate());
+  res.send(tropoHooks.translate(req.files[0]));
 });
 
 
